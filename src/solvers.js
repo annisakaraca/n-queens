@@ -34,27 +34,62 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0;
-  let numOfSolutions = [1, 1, 2, 6, 24, 120, 720, 5040, 40320];
+  let numOfPieces = 0;
+  let rounds = 0;
   let board = new Board({n: n});
-  (function traverseTheBoard(rowStart, colStart) {
-    if (!(numOfSolutions[n] === solutionCount)) {
-    for (let row = rowStart; row < board.rows().length; row++) {
-      for (let col = colStart; col < board.rows().length; col++) {
-        if (board.rows()[row][col] !== 1) {
-          board.togglePiece(row, col);
-          if (board.hasAnyRooksConflicts()) {
-            board.togglePiece(row, col);
-          } else {
-            traverseTheBoard(row, col);
+    function traverseTheBoard(matrix) {
+
+      if (numOfPieces === n) {
+        solutionCount++;
+        numOfPieces = 0;
+        return;
+      }
+      for (let row = 0; row < matrix.rows().length; row++) {
+        for (let col = 0; col < matrix.rows().length; col++) {
+          if (matrix.rows()[row][col] === 0) {
+            matrix.togglePiece(row, col);
+            if (matrix.hasAnyRooksConflicts()) {
+              matrix.togglePiece(row,col);
+            } else {
+              numOfPieces++;
+              rounds++;
+              traverseTheBoard(matrix);
+              rounds--;
+            }
+          }
+          if (rounds === 0 && solutionCount !== n) {
+            matrix = new Board({n:n});
           }
         }
       }
+      return
     }
-  }
-  }(0,0));
+    traverseTheBoard(board);
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
+  // (function traverseTheBoard(rowStart, colStart) {
+  //   if (numOfPieces === n) {
+  //     solutionCount++;
+  //     numOfPieces = 0;
+  //   }
+  //   for (let row = rowStart; row < board.rows().length; row++) {
+  //     for (let col = colStart; col < board.rows().length; col++) {
+  //       board.togglePiece(row, col);
+  //       if (board.hasAnyRooksConflicts()) {
+  //         board.togglePiece(row, col);
+  //       } else {
+  //         numOfPieces++;
+  //         if (col + 1 > board.rows().length) {
+  //           traverseTheBoard(row + 1, 0)
+  //         } else {
+  //           traverseTheBoard(row, col + 1);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }(0,0));
+
   // for (let firstRow = 0; firstRow < board.rows().length; firstRow++) {
   //   for (let firstCol = 0; firstCol < board.rows().length; firstCol++) {
   //     board.togglePiece(firstRow, firstCol);
