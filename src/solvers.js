@@ -37,37 +37,64 @@ window.countNRooksSolutions = function(n) {
   let numOfPieces = 0;
   let rounds = 0;
   let board = new Board({n: n});
-    function traverseTheBoard(matrix) {
 
+    function traverseTheBoard(rowStart, colStart) {
+      let hasChanged =0;
       if (numOfPieces === n) {
         solutionCount++;
-        numOfPieces = 0;
-        return;
+        numOfPieces--;
+        return
       }
-      for (let row = 0; row < matrix.rows().length; row++) {
-        for (let col = 0; col < matrix.rows().length; col++) {
-          if (matrix.rows()[row][col] === 0) {
-            matrix.togglePiece(row, col);
-            if (matrix.hasAnyRooksConflicts()) {
-              matrix.togglePiece(row,col);
-            } else {
-              numOfPieces++;
-              rounds++;
-              traverseTheBoard(matrix);
-              rounds--;
-            }
-          }
-          if (rounds === 0 && solutionCount !== n) {
-            matrix = new Board({n:n});
+      let rStart = rowStart;
+      let cStart = colStart;
+
+      for (let row = rStart; row < board.rows().length; row++ ) {
+        if (hasChanged !== 0) {
+          cStart = 0;
+        }
+        for (let col = cStart; col < board.rows().length; col++) {
+          board.togglePiece(row,col);
+          numOfPieces++;
+          if (board.hasAnyRooksConflicts()) {
+            board.togglePiece(row, col);
+            numOfPieces--;
+          } else {
+            if (col === board.rows().length - 1) {
+              traverseTheBoard(row + 1, 0)
+            } else traverseTheBoard(row, col + 1);
+            board.togglePiece(row, col)
           }
         }
+        hasChanged++;
       }
-      return
+      numOfPieces--;
     }
-    traverseTheBoard(board);
+    traverseTheBoard(0,0);
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
+// if (numOfPieces === n) {
+//   solutionCount++;
+//   numOfPieces = 0;
+//   return;
+// }
+// for (let row = 0; row < matrix.rows().length; row++) {
+//   for (let col = 0; col < matrix.rows().length; col++) {
+//     if (matrix.rows()[row][col] === 0) {
+//       matrix.togglePiece(row, col);
+//       if (matrix.hasAnyRooksConflicts()) {
+//         matrix.togglePiece(row,col);
+//       } else {
+//         numOfPieces++;
+//         traverseTheBoard(matrix);
+//         matrix.togglePiece(row,col);
+//         if (!(numOfPieces === 0)) {
+//           numOfPieces--;
+//         }
+//       }
+//     }
+//   }
+// }
   // (function traverseTheBoard(rowStart, colStart) {
   //   if (numOfPieces === n) {
   //     solutionCount++;
